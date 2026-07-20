@@ -1,5 +1,9 @@
 {
     "FirstName": "John",
     "LastName": "Doe",
-    "email": "johndoe@email.com"
+    "email": "johndoe@email.com",
+    "selectVacancy":"Payroll Administrator",
+    "StatusName":"Application Initiated", 
+    "dateFromValue": "2024-06-02",
+    "dateToValue": "2024-06-02"
 }

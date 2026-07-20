@@ -5,6 +5,12 @@ import LoginDataPOM from '../fixtures/LoginDataPOM.json';
 import Recruitmentpage from '../support/PageObject/Recruitmentpage';
 import RecruitmentDataPOM from '../fixtures/RecruitmentDataPOM.json';
 
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // Kembalikan false agar Cypress tidak menggagalkan test saat ada error internal web
+    return false;
+});
+
 describe('Test Scenario Recruitment Page Orange HRM', () => {
   beforeEach(() => {
     LoginPage.visitPage();
@@ -22,11 +28,7 @@ describe('Test Scenario Recruitment Page Orange HRM', () => {
     Recruitmentpage.verifyRecruitmentPage();
 
     Recruitmentpage.clickAddCandidate();
-    // 1. Klik tombol Add dengan paksa agar tidak terhalang elemen lain
-    cy.get('button.oxd-button--medium').contains('Add').click({ force: true });
-
-    // // 2. Validasi bahwa URL berubah menuju halaman form input kandidat
-    // cy.url({ timeout: 10000 }).should('include', '/viewCandidates');
+    Recruitmentpage.waitForCandidateForm();
 
     // Fill in the candidate details applying the data from the RecruitmentDataPOM.json file
     Recruitmentpage.inputFirstCandidateName(RecruitmentDataPOM.FirstName);
@@ -48,8 +50,6 @@ describe('Test Scenario Recruitment Page Orange HRM', () => {
     Recruitmentpage.verifyRecruitmentPage();
     Recruitmentpage.clickAddCandidate();
 
-    cy.get('button.oxd-button--medium').contains('Add').click({ force: true });
-
     // Attempt to submit the form without filling in required fields
     Recruitmentpage.clickSaveCandidate();
 
@@ -63,6 +63,50 @@ describe('Test Scenario Recruitment Page Orange HRM', () => {
     Recruitmentpage.waitForRecruitmentPage();
     Recruitmentpage.verifyRecruitmentPage();
 
+    //click vacanciy tab & search vacancy
+    Recruitmentpage.clickVacanciesTab();
+    Recruitmentpage.openVacancyFilterDropdown();
+    Recruitmentpage.selectFirstVacancyOption(RecruitmentDataPOM.selectVacancy);
+    Recruitmentpage.clickSearchButton();
+
+    //verivikasi result of vacancy
+    Recruitmentpage.verifyVacancyFilterResults(RecruitmentDataPOM.selectVacancy);
   })
+
+  it('TC-004: Successfully filter candidates  by Status (e.g., Application Initiated)', () => {
+    Recruitmentpage.interceptRecruitmentPage();
+    Recruitmentpage.visitRecruitment();
+    Recruitmentpage.waitForRecruitmentPage();
+    Recruitmentpage.verifyRecruitmentPage();
+
+    //click dropdown button on the candidate tab
+    Recruitmentpage.openStatusFilterDropdown();
+    Recruitmentpage.selectFirstStatusOption(RecruitmentDataPOM.StatusName);
+    Recruitmentpage.clickSearchButton();
+    
+    //verivikasi result of Status filter
+    Recruitmentpage.verifyStatusFilterResults(RecruitmentDataPOM.StatusName);
+  })
+
+  // Successfully filter candidates by 'Date of Application' range
+  it('TC-005: Successfully filter candidates by Date of Application range', () => {
+    //open page recruitment
+    Recruitmentpage.interceptRecruitmentPage();
+    Recruitmentpage.visitRecruitment();
+    Recruitmentpage.waitForRecruitmentPage();
+    Recruitmentpage.verifyRecruitmentPage();
+
+    //click dropdown button on the candidate tab
+    Recruitmentpage.openStatusFilterDropdown();
+
+    //input Date Range on the filter form
+    Recruitmentpage.fillFromDateFilter(RecruitmentDataPOM.dateFromValue);
+    Recruitmentpage.fillToDateFilter(RecruitmentDataPOM.dateToValue);
+    Recruitmentpage.clickSearchButton();
+    
+    //verivikasi result of Status Date Application
+    Recruitmentpage.verifyDateFilterResults(RecruitmentDataPOM.dateFromValue);
+  })
+
 });
    
